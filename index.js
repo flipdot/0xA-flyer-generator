@@ -23,6 +23,9 @@ async function makeFlyer() {
   const rocket = drawRocket(draw);
   const slogan = drawSlogan(draw);
 
+  const fontEffect = randomOption(["invert", "outline", "outline"]);
+
+  if (fontEffect === "invert") {
   // invert slogan inside of rocket
   const blackSlogan = slogan.clone();
   blackSlogan.fill("#000");
@@ -30,6 +33,20 @@ async function makeFlyer() {
     .group()
     .add(blackSlogan)
     .maskWith(rocket.clone());
+  }
+
+  if (fontEffect === "outline") {
+    // invert slogan inside of rocket
+    const blackSlogan = slogan.clone();
+
+    blackSlogan.stroke({ color: "#000", width: 4 });
+    draw
+      .group()
+      .add(blackSlogan)
+      .maskWith(rocket.clone());
+
+    slogan.front();
+  }
 
   drawTitle(draw);
   drawUrl(draw);
