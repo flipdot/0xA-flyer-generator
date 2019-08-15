@@ -92,12 +92,31 @@ function drawRocket(draw) {
 function drawSlogan(draw) {
   const slogan = draw.group();
 
+  const wrap = randomOption(['none', "word", "half"]);
+
+  let text = "10 YEARS IN SPACE";
+  let size = randomNumber(15, 18);
+
+  if (wrap === "word") {
+    text = text.split(" ").join("\n");
+    size = size * 2;
+  }
+
+  if (wrap === "half") {
+    const half = Math.floor(text.length / 2);
+    text =
+      text.substr(0, Math.floor(text.length / 2)).trim() +
+      "\n" +
+      text.substr(half).trim();
+    size = size * 2;
+  }
+
   slogan
-    .text("10 YEARS IN SPACE")
+    .text(text)
     .font({
       family: "monaco",
-      size: randomNumber(15, 18),
-      leading: "1.5em"
+      size,
+      leading: "1.5em",
     })
     .cx(0)
     .cy(0)
