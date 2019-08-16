@@ -53,11 +53,14 @@ async function makeFlyer() {
   drawDate(draw);
 }
 
-function positionRandomly(draw, obj) {
+function positionRandomly(draw, obj, paddingX = 0, paddingY = 0) {
   const bbox = obj.rbox(draw);
+
+  draw.rect(bbox.x, bbox.y, bbox.w, bbox.h).stroke({ color: '#0f0', width: 0.5 });
+
   obj
-    .x(randomNumber(bbox.w / 2, 210 - bbox.w / 2))
-    .y(randomNumber(bbox.h / 2, 297 - bbox.h / 2));
+    .x(randomNumber(bbox.w / 2 + paddingX, 210 - bbox.w / 2 - paddingX))
+    .y(randomNumber(bbox.h / 2 + paddingY, 297 - bbox.h / 2 - paddingY));
 }
 
 for (let i = 0; i < 20; i++) {
@@ -142,7 +145,7 @@ function drawSlogan(draw) {
 
   slogan.fill("#fff");
 
-  positionRandomly(draw, slogan);
+  positionRandomly(draw, slogan, 20, 8);
   return slogan;
 }
 
