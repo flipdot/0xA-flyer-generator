@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - 10
 
-script: npm run build
+script: npm run gh-pages
 
 deploy:
   provider: pages
