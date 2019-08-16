@@ -50,6 +50,7 @@ async function makeFlyer() {
 
   drawTitle(draw);
   drawUrl(draw);
+  drawDate(draw);
 }
 
 function positionRandomly(draw, obj) {
@@ -146,22 +147,31 @@ function drawSlogan(draw) {
 }
 
 function drawDate(draw) {
-  const date = draw.group();
+  const group = draw.group();
 
-  date
+  const title = group
     .text("2019/10/03 - 2019/10/06")
+    // .text("03.10.2019 - 06.10.2019")
     .font({
       family: "monaco",
-      size: randomNumber(8, 10),
+      size: 8,
       leading: "1.5em"
     })
-    .fill("#fff")
-    .cx(0)
-    .cy(0)
-    .transform({ rotation: randomOption([0, 90, 0, -90]) });
+    .cx(202)
+    .cy(63)
+    .rotate(-90)
+    .fill("#fff");
 
-  positionRandomly(draw, date);
-  return date;
+  const titleBounds = title.rbox(draw);
+  group
+    .rect(titleBounds.w, titleBounds.h + 3)
+    .cx(titleBounds.cx)
+    .cy(titleBounds.cy - 0.5)
+    .fill("#000");
+
+  title.front();
+
+  return group;
 }
 
 function drawStars(draw) {
