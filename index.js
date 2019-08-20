@@ -1,9 +1,13 @@
 import "babel-polyfill";
 import SVG from "svg.js";
+import FontFaceObserver from 'fontfaceobserver';
 
+import logo from "./flipdot-logo-white-text.png";
 import { randomNumber, randomOption } from "./random";
 
-async function makeFlyer() {
+const FONT_FAMILY = "ISOCPEUR";
+
+function makeFlyer() {
   // ===== setup canvas =====
 
   // create div
@@ -14,37 +18,37 @@ async function makeFlyer() {
 
   // create svg
   const draw = SVG(container);
-  draw.rect("100%", "100%").fill("#000");
   draw.viewbox(0, 0, 210, 297);
+  draw
+    .rect(210, 297)
+    .x(0)
+    .y(0)
+    .fill("#000");
 
   // ===== draw scene =====
 
   drawStars(draw);
   const rocket = drawRocket(draw);
-  const slogan = drawSlogan(draw);
+  const { slogan, size: sloganSize } = drawSlogan(draw);
 
   const fontEffect = randomOption(["invert", "outline", "outline"]);
 
   if (fontEffect === "invert") {
-  // invert slogan inside of rocket
-  const blackSlogan = slogan.clone();
-  blackSlogan.fill("#000");
-  draw
-    .group()
-    .add(blackSlogan)
-    .maskWith(rocket.clone());
+    // invert slogan inside of rocket
+    const blackSlogan = slogan.clone();
+    blackSlogan.fill("#000");
+    draw
+      .group()
+      .add(blackSlogan)
+      .maskWith(rocket.clone());
   }
 
   if (fontEffect === "outline") {
     // invert slogan inside of rocket
     const blackSlogan = slogan.clone();
-
-    blackSlogan.stroke({ color: "#000", width: 4 });
-    draw
-      .group()
-      .add(blackSlogan)
-      .maskWith(rocket.clone());
-
+    blackSlogan
+      .stroke({ color: "#000", width: Math.max(sloganSize / 8, 2) })
+      .attr({ "stroke-linejoin": "round" });
     slogan.front();
   }
 
@@ -53,21 +57,77 @@ async function makeFlyer() {
   drawDate(draw);
 }
 
+function makeBack() {
+  const frame = document.getElementById("app");
+  const container = document.createElement("div");
+  container.className = "page";
+  frame.appendChild(container);
+
+  // create svg
+  const draw = SVG(container);
+  draw.viewbox(0, 0, 210, 297);
+  draw
+    .rect(210, 297)
+    .x(0)
+    .y(0)
+    .fill("#000");
+
+  // ===== draw scene =====
+
+  drawStars(draw);
+  drawBackText(draw);
+}
+
 function positionRandomly(draw, obj, paddingX = 0, paddingY = 0) {
   const bbox = obj.rbox(draw);
-
-  draw.rect(bbox.x, bbox.y, bbox.w, bbox.h).stroke({ color: '#0f0', width: 0.5 });
 
   obj
     .x(randomNumber(bbox.w / 2 + paddingX, 210 - bbox.w / 2 - paddingX))
     .y(randomNumber(bbox.h / 2 + paddingY, 297 - bbox.h / 2 - paddingY));
 }
 
-for (let i = 0; i < 20; i++) {
-  makeFlyer();
-}
+
+var font = new FontFaceObserver('ISOCPEUR');
+font.load().then(() => {
+  for (let i = 0; i < 20; i++) {
+    makeFlyer();
+    makeBack();
+  }
+});
 
 // ================================ DRAWING STUFF ==================================
+
+function drawBackText(draw) {
+  const backText = draw.group();
+
+  let text = `There will be projects, talks,
+workshops, drinks, waffles, music,
+visuals, and like-minded people.
+
+More information at:
+0xA.flipdot.org`;
+
+  backText
+    .text(text)
+    .font({
+      family: FONT_FAMILY,
+      size: 10,
+      leading: 1.5
+    })
+    .cy(100)
+    .cx(105);
+
+  backText.fill("#fff");
+
+  const outline = backText.clone();
+  outline.stroke({ color: "#000", width: 8 }).attr({ "stroke-linejoin": "round" });;
+  backText.front();
+
+  draw
+    .image(logo, 80, 60)
+    .cx(105)
+    .cy(220);
+}
 
 function drawRocket(draw) {
   const rocket = draw.group();
@@ -113,14 +173,16 @@ function drawRocket(draw) {
 function drawSlogan(draw) {
   const slogan = draw.group();
 
-  const wrap = randomOption(['none', "word", "half"]);
+  const wrap = randomOption(["none", "word", "half"]);
 
   let text = "10 YEARS IN SPACE";
-  let size = randomNumber(15, 18);
+  let size = randomNumber(21, 25);
+  let anchor = randomOption(["start", "middle" /*, "end"*/]);
+  let rotation = randomOption([0, 90, 0, -90]);
 
   if (wrap === "word") {
     text = text.split(" ").join("\n");
-    size = size * 2;
+    size = rotation === 0 ? size * 1.9 : size * 1.7;
   }
 
   if (wrap === "half") {
@@ -129,50 +191,77 @@ function drawSlogan(draw) {
       text.substr(0, Math.floor(text.length / 2)).trim() +
       "\n" +
       text.substr(half).trim();
-    size = size * 2;
+    size = size * 1.9;
+    anchor = "middle";
   }
 
-  slogan
-    .text(text)
-    .font({
-      family: "monaco",
-      size,
-      leading: "1.5em",
-    })
-    .cx(0)
-    .cy(0)
-    .transform({ rotation: randomOption([0, 90, 0, -90]) });
+  if (wrap === "none" && rotation === 0) {
+    size = size * 0.8;
+  }
+
+  let leading = randomNumber(1.1, 1.4);
+
+  if (rotation !== 0) {
+    leading = randomNumber(1.0, 1.1);
+  }
+
+  const textElement = slogan.text(text).font({
+    family: FONT_FAMILY,
+    size,
+    leading,
+    anchor
+  });
+
+  if (anchor === "middle") {
+    textElement.x(0).cy(0);
+  } else {
+    textElement.cx(0).cy(0);
+  }
+
+  textElement.transform({ rotation });
 
   slogan.fill("#fff");
 
-  positionRandomly(draw, slogan, 20, 8);
-  return slogan;
+  positionRandomly(draw, slogan, 20, 20);
+  return { slogan, size };
 }
 
 function drawDate(draw) {
   const group = draw.group();
 
   const title = group
-    .text("2019/10/03 - 2019/10/06")
-    // .text("03.10.2019 - 06.10.2019")
+    .text("03.10.2019   06.10.2019")
     .font({
-      family: "monaco",
-      size: 8,
+      family: FONT_FAMILY,
+      size: 11,
       leading: "1.5em"
     })
     .cx(202)
-    .cy(63)
+    .cy(58)
+    .rotate(-90)
+    .fill("#fff");
+
+  const line = group
+    .text("-")
+    .font({
+      family: FONT_FAMILY,
+      size: 11,
+      leading: "1.5em"
+    })
+    .cx(200.5)
+    .cy(58)
     .rotate(-90)
     .fill("#fff");
 
   const titleBounds = title.rbox(draw);
   group
-    .rect(titleBounds.w, titleBounds.h + 3)
-    .cx(titleBounds.cx)
+    .rect(titleBounds.w + 2, titleBounds.h + 3)
+    .cx(titleBounds.cx - 1)
     .cy(titleBounds.cy - 0.5)
     .fill("#000");
 
   title.front();
+  line.front();
 
   return group;
 }
@@ -194,8 +283,8 @@ function drawTitle(draw) {
   const title = group
     .text("hackumenta")
     .font({
-      family: "monaco",
-      size: 8,
+      family: FONT_FAMILY,
+      size: 10,
       leading: "1.5em"
     })
     .x(10)
@@ -204,7 +293,7 @@ function drawTitle(draw) {
 
   const titleBounds = title.rbox(draw);
   group
-    .rect(titleBounds.w + 2, titleBounds.h)
+    .rect(titleBounds.w + 2, titleBounds.h + 2)
     .cx(titleBounds.cx)
     .cy(titleBounds.cy - 0.5)
     .fill("#000");
@@ -219,8 +308,8 @@ function drawUrl(draw) {
   const title = group
     .text("0xA.flipdot.org")
     .font({
-      family: "monaco",
-      size: 8,
+      family: FONT_FAMILY,
+      size: 10,
       leading: "1.5em"
     })
     .cx(105)
@@ -229,7 +318,7 @@ function drawUrl(draw) {
 
   const titleBounds = title.rbox(draw);
   group
-    .rect(titleBounds.w + 2, titleBounds.h)
+    .rect(titleBounds.w + 2, titleBounds.h + 2)
     .cx(titleBounds.cx)
     .cy(titleBounds.cy - 0.5)
     .fill("#000");
