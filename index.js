@@ -66,15 +66,15 @@ function makeBack() {
   // create svg
   const draw = SVG(container);
   draw.viewbox(0, 0, 210, 297);
-  draw
-    .rect(210, 297)
-    .x(0)
-    .y(0)
-    .fill("#000");
+  // draw
+  //   .rect(210, 297)
+  //   .x(0)
+  //   .y(0)
+  //   .fill("#000");
 
   // ===== draw scene =====
 
-  drawStars(draw);
+  // drawStars(draw);
   drawBackText(draw);
 }
 
@@ -89,10 +89,10 @@ function positionRandomly(draw, obj, paddingX = 0, paddingY = 0) {
 
 var font = new FontFaceObserver('ISOCPEUR');
 font.load().then(() => {
-  for (let i = 0; i < 20; i++) {
-    makeFlyer();
+  // for (let i = 0; i < 200; i++) {
+    // makeFlyer();
     makeBack();
-  }
+  // }
 });
 
 // ================================ DRAWING STUFF ==================================
@@ -100,33 +100,49 @@ font.load().then(() => {
 function drawBackText(draw) {
   const backText = draw.group();
 
-  let text = `There will be projects, talks,
-workshops, drinks, waffles, music,
-visuals, and like-minded people.
+  let text = `
+flipdot ist der Kasseler Hacker- und
+Makerspace seit 2009 und lokaler Chaos
+Computer Club Erfahrungsaustauschkreis
+seit 2016.
 
-More information at:
-0xA.flipdot.org`;
+Wir sind knapp 60 Mitglieden zwischen 14
+und 64 Jahren. Jeder ist willkommen,
+unabhängig von Interessen und Fähigkeiten.
+Wenn du Interesse an Technik, Bausteln,
+Hacken oder Coden hast, gerne Fragen
+stellst und beantwortest, sei willkommen!
+
+Wir laden Dich ein, uns zu unserer
+Veranstaltung Hackumenta – 10 Years in
+Space zu besuchen, mit der wir unser
+10-jähriges Bestehen feiern. Hier kannst
+du unseren Space besichtigen, Workshops
+und Vorträge besuchen, leckere Sachen
+essen, feine Musik hören, und realisierte
+und entstehende Projekte besichtigen.
+`;
 
   backText
     .text(text)
     .font({
       family: FONT_FAMILY,
-      size: 10,
-      leading: 1.5
+      size: 9,
+      leading: 1.4
     })
-    .cy(100)
+    .cy(147)
     .cx(105);
 
-  backText.fill("#fff");
+  backText.fill("#000");
 
-  const outline = backText.clone();
-  outline.stroke({ color: "#000", width: 8 }).attr({ "stroke-linejoin": "round" });;
-  backText.front();
+  // const outline = backText.clone();
+  // outline.stroke({ color: "#000", width: 8 }).attr({ "stroke-linejoin": "round" });;
+  // backText.front();
 
-  draw
-    .image(logo, 80, 60)
-    .cx(105)
-    .cy(220);
+  // draw
+  //   .image(logo, 80, 60)
+  //   .cx(105)
+  //   .cy(220);
 }
 
 function drawRocket(draw) {
