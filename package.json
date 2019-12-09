@@ -11,7 +11,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "fontfaceobserver": "^2.1.0",
-    "parcel": "^1.12.3",
+    "parcel": "^1.12.4",
     "svg.js": "^2.7.1"
   },
   "devDependencies": {
